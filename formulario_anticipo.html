@@ -120,63 +120,7 @@
   }
   .monto-wrap input { padding-left: 32px; }
 
-  .cuenta-toggle { display: flex; gap: 10px; }
-  .toggle-btn {
-    flex: 1;
-    padding: 13px 10px;
-    border-radius: var(--radius);
-    border: 1.5px solid var(--border);
-    background: var(--card);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--ink-muted);
-    cursor: pointer;
-    transition: all 0.2s;
-    text-align: center;
-  }
-  .toggle-btn.active {
-    background: var(--accent-pale);
-    border-color: var(--accent-light);
-    color: var(--accent);
-    font-weight: 700;
-  }
 
-  .banco-habitual-box {
-    display: none;
-    background: var(--accent-pale);
-    border: 1.5px solid var(--accent-light);
-    border-radius: var(--radius);
-    padding: 14px 16px;
-    margin-top: 14px;
-  }
-  .banco-habitual-box.visible { display: block; }
-  .bh-label {
-    font-size: 11px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: var(--accent-light);
-    margin-bottom: 4px;
-  }
-  .bh-valor {
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--accent);
-  }
-
-  .nueva-cuenta { margin-top: 14px; display: none; }
-  .nueva-cuenta.visible { display: block; }
-
-  .nota-info {
-    background: var(--accent-pale);
-    border-left: 3px solid var(--accent);
-    border-radius: 8px;
-    padding: 12px 14px;
-    font-size: 13px;
-    color: var(--accent);
-    margin-bottom: 16px;
-    line-height: 1.5;
-  }
 
   .err-msg {
     font-size: 12px;
@@ -401,39 +345,10 @@
 
   <div class="section-label">Cuenta Bancaria</div>
 
-  <div class="nota-info">
-    Si tus datos de cuenta no han cambiado, selecciona <strong>Cuenta habitual</strong>. Solo completa si deseas usar una cuenta distinta.
-  </div>
-
   <div class="field">
-    <div class="cuenta-toggle">
-      <button type="button" class="toggle-btn active" id="btn-habitual" onclick="setCuenta('habitual')">✓ Cuenta habitual</button>
-      <button type="button" class="toggle-btn" id="btn-nueva" onclick="setCuenta('nueva')">Cuenta nueva</button>
-    </div>
-  </div>
-
-  <div class="banco-habitual-box" id="bancoHabitualBox">
-    <div class="bh-label">Banco registrado</div>
-    <div class="bh-valor" id="bancoHabitualNombre"></div>
-  </div>
-
-  <div class="nueva-cuenta" id="nuevaCuentaSection">
-    <div class="field">
-      <label for="tipoCuenta">Tipo de cuenta</label>
-      <select id="tipoCuenta">
-        <option value="">— Selecciona —</option>
-        <option>Cuenta Corriente</option>
-        <option>Cuenta Vista</option>
-        <option>Cuenta de Ahorro</option>
-        <option>Cuenta RUT</option>
-      </select>
-      <div class="err-msg" id="err-tipoCuenta">Selecciona el tipo de cuenta</div>
-    </div>
-    <div class="field">
-      <label for="numCuenta">Número de cuenta</label>
-      <input type="text" id="numCuenta" placeholder="Ej: 00123456789" inputmode="numeric">
-      <div class="err-msg" id="err-numCuenta">Ingresa el número de cuenta</div>
-    </div>
+    <label for="numCuenta">Número de cuenta</label>
+    <input type="text" id="numCuenta" placeholder="Ej: 00123456789" inputmode="numeric">
+    <div class="err-msg" id="err-numCuenta">Ingresa el número de cuenta</div>
   </div>
 
   <button class="submit-btn" id="submitBtn" onclick="enviarFormulario()">Enviar solicitud →</button>
@@ -474,26 +389,8 @@ const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzZ7QHQtkZV9e0D1r532
 // ─────────────────────────────────────────────────────────────
 
 // Verificar si está configurado
-if (SCRIPT_URL === 'https://bmolina2020.github.io/Anticipos-Honorarios/formulario_anticipo.html') {
+if (SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbzZ7QHQtkZV9e0D1r532-E_WhoQNI9x8Se4rfypdigQjFrvAAOHASeBYk8maWVz-F39DA/exec') {
   document.getElementById('configWarning').classList.add('visible');
-}
-
-let cuentaMode = 'habitual';
-
-function actualizarBancoHabitual() {
-  const banco = document.getElementById('banco').value.trim();
-  const box = document.getElementById('bancoHabitualBox');
-  document.getElementById('bancoHabitualNombre').textContent = banco;
-  box.classList.toggle('visible', cuentaMode === 'habitual' && banco.length > 0);
-}
-document.getElementById('banco').addEventListener('input', actualizarBancoHabitual);
-
-function setCuenta(mode) {
-  cuentaMode = mode;
-  document.getElementById('btn-habitual').classList.toggle('active', mode === 'habitual');
-  document.getElementById('btn-nueva').classList.toggle('active', mode === 'nueva');
-  document.getElementById('nuevaCuentaSection').classList.toggle('visible', mode === 'nueva');
-  actualizarBancoHabitual();
 }
 
 function formatRut(val) {
@@ -518,25 +415,17 @@ function showErr(id, show) {
 
 function validate() {
   let ok = true;
-  ['nombre','monto','nombreTransf','rut','banco'].forEach(c => {
+  ['nombre','monto','nombreTransf','rut','banco','numCuenta'].forEach(c => {
     const v = document.getElementById(c)?.value?.trim();
     showErr(c, !v);
     if (!v) ok = false;
   });
-  if (cuentaMode === 'nueva') {
-    ['tipoCuenta','numCuenta'].forEach(c => {
-      const v = document.getElementById(c)?.value?.trim();
-      showErr(c, !v);
-      if (!v) ok = false;
-    });
-  }
   return ok;
 }
 
 async function enviarFormulario() {
   if (!validate()) return;
 
-  const esHabitual = cuentaMode === 'habitual';
   const montoNum = parseInt(document.getElementById('monto').value.trim());
 
   const data = {
@@ -548,9 +437,8 @@ async function enviarFormulario() {
     nombreTransf:  document.getElementById('nombreTransf').value.trim(),
     rut:           document.getElementById('rut').value.trim(),
     banco:         document.getElementById('banco').value.trim(),
-    cuentaHabitual: esHabitual ? 'Sí' : 'No',
-    tipoCuenta:    esHabitual ? '' : document.getElementById('tipoCuenta').value,
-    numCuenta:     esHabitual ? '' : document.getElementById('numCuenta').value.trim(),
+    tipoCuenta:    '',
+    numCuenta:     document.getElementById('numCuenta').value.trim(),
   };
 
   document.getElementById('loading').classList.add('visible');
@@ -581,11 +469,7 @@ function mostrarResumen(d) {
     ['Nombre transferencia', d.nombreTransf],
     ['RUT', d.rut],
     ['Banco', d.banco],
-    ['Cuenta habitual', d.cuentaHabitual],
-    ...(d.cuentaHabitual === 'No' ? [
-      ['Tipo de cuenta', d.tipoCuenta],
-      ['N° cuenta', d.numCuenta],
-    ] : []),
+    ['N° cuenta', d.numCuenta],
     ['Fecha', d.fecha + ' ' + d.hora],
   ];
   document.getElementById('resumenContenido').innerHTML = filas
@@ -610,10 +494,9 @@ function copiarResumen() {
 }
 
 function nuevaSolicitud() {
-  ['nombre','monto','nombreTransf','rut','banco','tipoCuenta','numCuenta']
+  ['nombre','monto','nombreTransf','rut','banco','numCuenta']
     .forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
   document.getElementById('submitBtn').disabled = false;
-  setCuenta('habitual');
   document.getElementById('formWrapper').style.display = '';
   document.getElementById('successScreen').classList.remove('visible');
   window.scrollTo(0, 0);
